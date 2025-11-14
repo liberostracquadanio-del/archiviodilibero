@@ -16,7 +16,8 @@
     "react-dom": "^19.2.0",
     "typescript": "4.9.5",
     "react-scripts": "5.0.1",
-    "@types/cheerio": "^0.22.35"
+    "@types/cheerio": "^0.22.35",
+    "node-fetch": "^3.3.2" 
   },
   "browserslist": {
     "production": [
@@ -31,4 +32,5 @@
     ]
   }
 }
+
 
