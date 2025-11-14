@@ -1,32 +1,25 @@
-// Questo file dovrebbe essere deployato come una Serverless Function
-// su una piattaforma come Vercel o Google Cloud Functions.
-// Non può essere eseguito direttamente nel browser.
+// tuo-progetto/api/analyze-url.ts
 
-// Per eseguirlo, avrai bisogno di installare queste dipendenze nel tuo progetto backend:
-// npm install @google/genai cheerio
-
+// IMPORT NECESSARI PER NODE.JS
 import { GoogleGenAI, Type } from "@google/genai";
+import * as cheerio from 'cheerio'; // <--- ORA USIAMO CHEERIO
+import fetch from 'node-fetch'; // <--- ASSICURATI DI AVER INSTALLATO 'node-fetch' se non usi la fetch globale
 
-// Funzione 'cheerio' fittizia per l'ambiente di sviluppo locale.
-// In un ambiente server reale, dovresti importare 'cheerio'.
-// import * as cheerio from 'cheerio';
-declare function load(html: string): any;
+// Rimuoviamo le dichiarazioni fittizie e gli import inutili del browser
 
 // Simula la risposta di una funzione serverless (es. in Vercel)
 interface ServerlessResponse {
   status: (code: number) => { json: (data: any) => void };
+  setHeader: (name: string, value: string) => void;
 }
 
 // Handler principale della nostra API
 export default async function handler(req: { method: string; body: { url: string } }, res: ServerlessResponse) {
-  // Gestione CORS per permettere al frontend di chiamare questa API
-  // In un ambiente reale, questi header andrebbero impostati nella configurazione del server/piattaforma
-  /*
+  // Gestione CORS: Necessaria per permettere al frontend di chiamare questa API
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*'); // O un'origine specifica
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Sostituire con l'URL del tuo frontend in produzione
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, ...');
-  */
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
     return res.status(200).json({ message: 'OK' });
@@ -43,23 +36,20 @@ export default async function handler(req: { method: string; body: { url: string
   }
 
   try {
-    // --- 1. Web Scraping: Estrazione del testo dalla pagina ---
-    // In un ambiente server Node.js, useresti 'node-fetch' o 'axios'
+    // --- 1. Web Scraping: Estrazione del testo dalla pagina (VERSIONE NODE.JS) ---
+    // Usiamo fetch (standard in Node.js moderno) per ottenere l'HTML
     const pageResponse = await fetch(url);
     if (!pageResponse.ok) {
       throw new Error(`Impossibile raggiungere la pagina. Status: ${pageResponse.status}`);
     }
     const html = await pageResponse.text();
     
-    // Utilizzo di una libreria come 'cheerio' per parsare l'HTML
-    // const $ = cheerio.load(html);
-    // const articleText = $('article p').text() || $('main p').text() || $('p').text();
+    // Utilizzo di 'cheerio' per parsare l'HTML e SCRAPARE il testo
+    const $ = cheerio.load(html);
     
-    // Dato che non possiamo usare cheerio qui, simuliamo l'estrazione
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-    const paragraphs = Array.from(tempDiv.querySelectorAll('p')).map(p => p.textContent);
-    const articleText = paragraphs.join('\n\n').trim();
+    // Tenta di estrarre il testo dai tag comuni di articolo
+    // Utilizziamo .text() alla fine per ottenere il testo combinato
+    const articleText = $('article p, main p, p').text().trim();
 
     if (!articleText) {
       throw new Error("Impossibile estrarre un testo significativo dall'articolo. La struttura della pagina potrebbe essere non standard.");
