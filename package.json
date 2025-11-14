@@ -14,7 +14,9 @@
     "cheerio": "^1.0.0-rc.12",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "react-scripts": "5.0.1",
+    "@types/cheerio": "^0.22.35"
   },
   "browserslist": {
     "production": [
