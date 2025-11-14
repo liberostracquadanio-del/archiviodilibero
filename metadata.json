@@ -1,0 +1,5 @@
+{
+  "name": "Archivio del Giornalista",
+  "description": "Un'applicazione per aiutare i giornalisti a catalogare e ricercare notizie, indicizzate per parole chiave e categoria.",
+  "requestFramePermissions": []
+}
